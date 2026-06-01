@@ -1,0 +1,48 @@
+name: OpenCart Automation CI
+on:
+  push:
+    branches:
+      - main
+
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+    
+      - name: Setup Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+    
+      - name: Verify Maven Installation
+        run: mvn -version
+    
+      - name: Clean and Build Project
+        run: mvn clean compile
+    
+      - name: Execute Test Suite
+        run: mvn test
+    
+      - name: Upload TestNG Reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: TestNG-Reports
+          path: test-output/
+    
+      - name: Upload Extent Reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Extent-Reports
+          path: reports/
+
